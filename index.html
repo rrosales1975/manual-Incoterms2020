@@ -21,6 +21,22 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .transition-width { transition: width 0.5s ease-in-out; }
+        
+        /* Estilos para el posicionamiento absoluto de los iconos sobre las barras */
+        .bar-container-relative { 
+            position: relative; 
+        }
+        .bar-icon-absolute { 
+            position: absolute; 
+            top: 50%; /* Centra verticalmente */
+            transform: translate(-50%, -50%); 
+            z-index: 20; 
+            /* Se estandariza el tamaño a 24x24px */
+            height: 24px;
+            width: 24px;
+            /* Añadir sombra para que resalte sobre la barra */
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -30,9 +46,9 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- Iconos SVG ---
+        // --- Iconos SVG de Transporte y Personas ---
         const IconShip = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9 1 2.5 1S13.2 20 14.5 20c1.9 0 2.4 1 2.5 1 .5.5 1 1 1.5 1 2 0 3-2 3.5-2.5"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.9 5.8 2.8 8"/><path d="M10 10V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v6"/><polyline points="8 15 12 17 16 15"/><path d="M2.1 14.8c.2-.5.5-.8 1-.6s.8.5.6 1c-.2.5-.5.8-1 .6s-.8-.5-.6-1z"/><path d="M20.9 14.8c.2.5.5-.8 1 .6s.8-.5.6-1c-.2.5-.5-.8-1 .6s-.8.5-.6-1z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9 1 2.5 1S13.2 20 14.5 20c1.9 0 2.4 1 2.5 1 .5.5 1 1 1.5 1 2 0 3-2 3.5-2.5"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.9 5.8 2.8 8"/><path d="M10 10V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v6"/><polyline points="8 15 12 17 16 15"/><path d="M2.1 14.8c.2-.5.5-.8 1-.6s.8.5.6 1c-.2.5-.5.8-1 .6s-.8-.5-.6-1z"/><path d="M20.9 14.8c.2.5.5-.8 1 .6s.8-.5.6-1c-.2.5-.5.8-1 .6s-.8.5-.6-1z"/></svg>
         );
         const IconTruck = ({ className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="13" x="2" y="5" rx="2"/><path d="M16 5v3.68a2 2 0 0 0 .54 1.35l2.5 2.65a2 2 0 0 1 .46 1.32V18"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
@@ -49,6 +65,37 @@
         const IconPresentation = ({ className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
         );
+        
+        // Iconos de Rol
+        const IconWoman = ({ className }) => (
+            // Vendedor: Mujer
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="5" r="3"/><path d="M7 22v-3.5C7 16 10 14 12 14s5 2 5 4.5V22"/></svg>
+        );
+        const IconMan = ({ className }) => (
+            // Comprador: Hombre
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="7" r="4"/><path d="M18 22v-2a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v2"/></svg>
+        );
+
+        // --- ICONOS DE BARRAS ---
+        const IconBox = ({ className }) => (
+            // Caja de Carga (para el Riesgo - Universal)
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className={className}>
+              {/* Box exterior (sólido) */}
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+              {/* Línea blanca divisoria interna para mejor visualización */}
+              <path fill="#ffffff" d="m12 15 5-2.8-5-3-5 3 5 2.8Z"/>
+            </svg>
+        );
+        
+        const IconDollar = ({ className }) => (
+            // Icono de Dólar/Moneda (para Costo)
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z" fill="currentColor" stroke="none"/>
+                <path d="M11.75 14h.5a.75.75 0 0 0 0-1.5h-.5a2.25 2.25 0 1 1 0-4.5h2.5M10.5 7v1M13.5 16v-1" fill="none" stroke="#fff" strokeWidth="2"/>
+                <circle cx="12" cy="12" r="9" fill="none" stroke="#fff" strokeWidth="1.5"/>
+            </svg>
+        );
+
 
         // Función para seleccionar un icono basado en el Incoterm (para el sidebar y el panel principal)
         const getTermIcon = (termId, termType, className) => {
@@ -73,10 +120,10 @@
             }
         };
 
-        // --- Base de Datos de Incoterms (ACTUALIZADA con precisión de ICC Chart) ---
+        // --- Base de Datos de Incoterms (ACTUALIZADA con precisiones de ICC) ---
         const incotermsData = [
             // Reglas 'E' y 'F' (Baja obligación del vendedor)
-            { id: 'EXW', name: 'EXW - Ex Works', desc: 'En Fábrica', sellerRisk: 10, buyerRisk: 90, sellerCost: 10, buyerCost: 90, type: 'any', details: 'El vendedor solo entrega en sus instalaciones. El comprador asume casi TODOS los costos, riesgos y la exportación.' },
+            { id: 'EXW', name: 'EXW - Ex Works', desc: 'En Fábrica', sellerRisk: 10, buyerRisk: 90, sellerCost: 10, buyerCost: 90, type: 'any', details: 'El vendedor solo entrega en sus instalaciones. El comprador asume casi TODOS los costos, riesgos y la exportación. **ADVERTENCIA: Usar con precaución en comercio internacional.**' },
             { id: 'FCA', name: 'FCA - Free Carrier', desc: 'Franco Porteador', sellerRisk: 25, buyerRisk: 75, sellerCost: 25, buyerCost: 75, type: 'any', details: 'El riesgo se transfiere al entregar al transportista en el lugar acordado. El vendedor gestiona la exportación.' },
             
             // Reglas 'C' (Separación de Riesgo y Costo - Riesgo termina temprano, Costo termina tarde)
@@ -87,44 +134,58 @@
             { id: 'CIP', name: 'CIP - Carriage & Insurance Paid', desc: 'Transporte y Seguro Pagados', 
               sellerRisk: 25, buyerRisk: 75, // Riesgo se transfiere al primer transportista (origen)
               sellerCost: 75, buyerCost: 25, // Vendedor paga transporte y SEGURO de cobertura amplia (Cláusula A).
-              type: 'any', details: 'Similar a CPT, pero el vendedor debe contratar un seguro de cobertura amplia (Cláusula A) a favor del comprador.' },
+              type: 'any', details: 'Similar a CPT, pero el vendedor debe contratar un seguro de cobertura **amplia (Cláusula A)** a favor del comprador.' },
             
             // Reglas 'D' (Alta obligación del vendedor)
             { id: 'DAP', name: 'DAP - Delivered at Place', desc: 'Entregada en Lugar', sellerRisk: 85, buyerRisk: 15, sellerCost: 85, buyerCost: 15, type: 'any', details: 'El vendedor asume riesgos y costos hasta el lugar de destino, lista para descargar (sin descargar). El comprador gestiona la importación.' },
-            { id: 'DPU', name: 'DPU - Delivered at Place Unloaded', desc: 'Entregada y Descargada', sellerRisk: 90, buyerRisk: 10, sellerCost: 90, buyerCost: 10, type: 'any', details: 'El vendedor asume todo, incluyendo la DESCARGA en el lugar de destino. Única regla que exige esto al vendedor.' },
+            { id: 'DPU', name: 'DPU - Delivered at Place Unloaded', desc: 'Entregada y Descargada', sellerRisk: 90, buyerRisk: 10, sellerCost: 90, buyerCost: 10, type: 'any', details: 'El vendedor asume todo, incluyendo la **DESCARGA** en el lugar de destino. Es la única regla que exige esto al vendedor.' },
             { id: 'DDP', name: 'DDP - Delivered Duty Paid', desc: 'Entregada Derechos Pagados', sellerRisk: 98, buyerRisk: 2, sellerCost: 98, buyerCost: 2, type: 'any', details: 'Máxima obligación del vendedor. Asume todos los riesgos, costos, e incluye el pago de impuestos y aduanas de IMPORTACIÓN.' },
             
             // Reglas Marítimas 'F'
-            { id: 'FAS', name: 'FAS - Free Alongside Ship', desc: 'Franco al Costado del Buque', sellerRisk: 35, buyerRisk: 65, sellerCost: 35, buyerCost: 65, type: 'sea', details: 'Solo marítimo. El riesgo y el costo pasan cuando la mercancía está AL COSTADO del buque en el puerto de embarque.' },
-            { id: 'FOB', name: 'FOB - Free On Board', desc: 'Franco a Bordo', sellerRisk: 45, buyerRisk: 55, sellerCost: 45, buyerCost: 55, type: 'sea', details: 'Solo marítimo. El riesgo y el costo pasan cuando la carga está A BORDO del buque. ¡Usar FCA para contenedores!' },
+            { id: 'FAS', name: 'FAS - Free Alongside Ship', desc: 'Franco al Costado del Buque', sellerRisk: 35, buyerRisk: 65, sellerCost: 35, buyerCost: 65, type: 'sea', details: 'Solo marítimo. El riesgo y el costo pasan cuando la mercancía está **AL COSTADO** del buque en el puerto de embarque. **ADVERTENCIA: Usar FCA para contenedores.**' },
+            { id: 'FOB', name: 'FOB - Free On Board', desc: 'Franco a Bordo', sellerRisk: 45, buyerRisk: 55, sellerCost: 45, buyerCost: 55, type: 'sea', details: 'Solo marítimo. El riesgo y el costo pasan cuando la carga está **A BORDO** del buque. ¡Usar FCA para contenedores!' },
             
             // Reglas Marítimas 'C' (Separación de Riesgo y Costo - Riesgo termina a bordo, Costo termina en destino)
             { id: 'CFR', name: 'CFR - Cost and Freight', desc: 'Costo y Flete', 
               sellerRisk: 45, buyerRisk: 55, // Riesgo se transfiere cuando la carga está A BORDO (origen)
               sellerCost: 70, buyerCost: 30, // Vendedor paga el flete hasta destino.
-              type: 'sea', details: 'El vendedor PAGA el flete hasta el puerto de destino (Costo), pero el RIESGO se transfiere al comprador cuando la mercancía está A BORDO en origen.' },
+              type: 'sea', details: 'El vendedor PAGA el transporte hasta destino (Costo), pero el RIESGO se transfiere al comprador cuando la mercancía está **A BORDO** en origen.' },
             { id: 'CIF', name: 'CIF - Cost, Insurance & Freight', desc: 'Costo, Seguro y Flete', 
               sellerRisk: 45, buyerRisk: 55, // Riesgo se transfiere cuando la carga está A BORDO (origen)
               sellerCost: 80, buyerCost: 20, // Vendedor paga flete y SEGURO básico (Cláusula C).
-              type: 'sea', details: 'Similar a CFR, pero el vendedor debe contratar un seguro básico (Cláusula C) para el transporte principal.' },
+              type: 'sea', details: 'Similar a CFR, pero el vendedor debe contratar un seguro de cobertura **mínima (Cláusula C)** a favor del comprador.' },
         ];
 
-        // --- Componentes ---
+        // Componente que decide qué icono mostrar en la barra de riesgo y dónde posicionarlo
+        const RiskMarker = ({ term }) => {
+            // Se utiliza IconBox universal para todos los términos
+            let iconComponent = IconBox;
+            let iconClassName = "bar-icon-absolute text-blue-500 w-6 h-6";
+            let leftPosition = `${term.sellerRisk}%`;
+            let tooltip = "El riesgo se transfiere en el punto de entrega especificado.";
 
-        const ProgressBar = ({ label, value, colorClass }) => (
-            <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1 font-semibold text-gray-700">
-                    <span>{label}</span>
-                    <span>{value}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
-                    <div 
-                        className={`h-4 rounded-full transition-width ${colorClass}`} 
-                        style={{ width: `${value}%` }}
-                    ></div>
-                </div>
-            </div>
-        );
+            // Ajustamos el tooltip según el término
+            if (term.id === 'FAS') {
+                tooltip = "El riesgo se transfiere al costado del buque (puerto de embarque).";
+            } else if (term.id === 'FOB' || term.id === 'CFR' || term.id === 'CIF') {
+                tooltip = "El riesgo se transfiere a bordo del buque (puerto de embarque).";
+            } else if (term.type === 'any') {
+                // Esta etiqueta cubre EXW, FCA, CPT, CIP, DAP, DPU, DDP
+                tooltip = "El riesgo se transfiere al primer transportista o en el lugar convenido.";
+            }
+            
+            const Icon = iconComponent;
+
+            return (
+                <Icon 
+                    className={iconClassName} 
+                    style={{ left: leftPosition }} 
+                    title={tooltip}
+                />
+            );
+        };
+
+        // --- Componentes ---
 
         const TermCard = ({ term, isSelected, onClick }) => (
             <button 
@@ -150,7 +211,6 @@
             const handleTransport = (type) => {
                 setTransport(type);
                 if (type === 'poly') {
-                    // Si es polivalente, mostramos recomendación directa
                     setStep(3);
                 } else {
                     setStep(2);
@@ -159,9 +219,9 @@
 
             const handleContainer = (isContainer) => {
                 if (isContainer) {
-                    onRecommend('FCA'); // Recomendación principal para contenedor
+                    onRecommend('FCA'); 
                 } else {
-                    onRecommend('FOB'); // Tradicional para granel
+                    onRecommend('FOB'); 
                 }
             };
 
@@ -306,7 +366,7 @@
                                                         {selectedTerm.name}
                                                     </p>
                                                 </div>
-                                                {/* CORRECCIÓN APLICADA AQUÍ: Usa la función getTermIcon en el panel principal */}
+                                                {/* Icono Principal: Usa la función getTermIcon para el ícono específico de la regla */}
                                                 <div className={`p-3 rounded-full ${selectedTerm.type === 'sea' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
                                                     {getTermIcon(selectedTerm.id, selectedTerm.type, 'w-8 h-8')}
                                                 </div>
@@ -319,37 +379,42 @@
                                         {/* Gráficos */}
                                         <div className="p-6 md:p-8 space-y-8">
                                             
-                                            {/* Sección Riesgo */}
+                                            {/* Sección Riesgo - UNIFICADA EN UNA SOLA BARRA */}
                                             <div>
                                                 <div className="flex items-center gap-2 mb-4">
                                                     <div className="w-1 h-6 bg-red-500 rounded-full"></div>
                                                     <h3 className={`font-bold text-lg ${presentationMode ? 'text-gray-200' : 'text-gray-800'}`}>Transferencia de Riesgo</h3>
                                                 </div>
                                                 
-                                                <div className="space-y-4">
-                                                    <div>
-                                                        <div className="flex justify-between mb-1">
-                                                            <span className={`text-sm font-medium ${presentationMode ? 'text-blue-300' : 'text-blue-700'}`}>Vendedor (Exportador)</span>
-                                                            <span className="text-sm font-bold">{selectedTerm.sellerRisk}%</span>
-                                                        </div>
-                                                        <div className="w-full bg-gray-700/10 rounded-full h-5 overflow-hidden">
-                                                            <div className="h-5 bg-blue-500 rounded-full transition-width" style={{width: `${selectedTerm.sellerRisk}%`}}></div>
-                                                        </div>
+                                                {/* Contenedor de la barra unificada y el Icono de Caja/Barco */}
+                                                <div className="w-full bg-gray-200 rounded-full h-5 flex shadow-inner bar-container-relative">
+                                                    
+                                                    {/* Marcador de Riesgo (Caja universal) */}
+                                                    <RiskMarker term={selectedTerm} />
+
+                                                    {/* Riesgo del Vendedor (Azul) */}
+                                                    <div 
+                                                        className="h-full bg-blue-500 flex items-center justify-center text-[10px] text-white font-bold transition-width" 
+                                                        style={{width: `${selectedTerm.sellerRisk}%`}}
+                                                    >
+                                                        {selectedTerm.sellerRisk > 5 ? <><IconWoman className="inline w-3 h-3 mr-1"/> Vendedor</> : ''}
                                                     </div>
-                                                    <div>
-                                                        <div className="flex justify-between mb-1">
-                                                            <span className={`text-sm font-medium ${presentationMode ? 'text-orange-300' : 'text-orange-700'}`}>Comprador (Importador)</span>
-                                                            <span className="text-sm font-bold">{selectedTerm.buyerRisk}%</span>
-                                                        </div>
-                                                        <div className="w-full bg-gray-700/10 rounded-full h-5 overflow-hidden">
-                                                            <div className="h-5 bg-orange-400 rounded-full transition-width" style={{width: `${selectedTerm.buyerRisk}%`}}></div>
-                                                        </div>
+                                                    {/* Riesgo del Comprador (Naranja) */}
+                                                    <div 
+                                                        className="h-full bg-orange-400 flex items-center justify-center text-[10px] text-yellow-900 font-bold transition-width" 
+                                                        style={{width: `${selectedTerm.buyerRisk}%`}}
+                                                    >
+                                                        {selectedTerm.buyerRisk > 5 ? <><IconMan className="inline w-3 h-3 mr-1"/> Comprador</> : ''}
                                                     </div>
                                                 </div>
-                                                <p className="text-xs text-gray-400 mt-2 text-right">El punto donde termina la barra azul es donde el riesgo se transfiere.</p>
+                                                <div className="flex justify-between mt-2 text-xs uppercase font-bold tracking-widest text-gray-400">
+                                                    <span>Origen</span>
+                                                    <span>Destino</span>
+                                                </div>
+                                                <p className="text-xs text-gray-400 mt-2 text-right">El icono marca el punto exacto de transferencia del riesgo.</p>
                                             </div>
 
-                                            {/* Sección Costo */}
+                                            {/* Sección Costo - UNIFICADA EN UNA SOLA BARRA */}
                                             <div>
                                                  <div className="flex items-center gap-2 mb-4">
                                                     <div className="w-1 h-6 bg-green-500 rounded-full"></div>
@@ -360,32 +425,60 @@
                                                         <span>Origen</span>
                                                         <span>Destino</span>
                                                     </div>
-                                                    <div className="h-4 bg-gray-200 rounded-full overflow-hidden flex">
+                                                    {/* Contenedor de la barra unificada y el Icono de Dólar */}
+                                                    <div className="h-5 bg-gray-200 rounded-full flex bar-container-relative">
+                                                        
+                                                        {/* Icono de Dólar (Marca el punto de transferencia del Costo) */}
+                                                        <IconDollar 
+                                                            className="bar-icon-absolute text-green-600 w-6 h-6" 
+                                                            style={{ left: `${selectedTerm.sellerCost}%` }} 
+                                                            title="Transferencia de Costo"
+                                                        />
+
+                                                        {/* Vendedor (AZUL) */}
                                                         <div 
-                                                            className="h-full bg-green-600 flex items-center justify-center text-[10px] text-white font-bold transition-width" 
+                                                            className="h-full bg-blue-500 flex items-center justify-center text-[10px] text-white font-bold transition-width" 
                                                             style={{width: `${selectedTerm.sellerCost}%`}}
                                                         >
-                                                            Vendedor
+                                                            {selectedTerm.sellerCost > 5 ? <><IconWoman className="inline w-3 h-3 mr-1"/> Vendedor</> : ''}
                                                         </div>
+                                                        {/* Comprador (NARANJA) */}
                                                         <div 
-                                                            className="h-full bg-yellow-400 flex items-center justify-center text-[10px] text-yellow-900 font-bold transition-width" 
+                                                            className="h-full bg-orange-400 flex items-center justify-center text-[10px] text-yellow-900 font-bold transition-width" 
                                                             style={{width: `${selectedTerm.buyerCost}%`}}
                                                         >
-                                                            Comprador
+                                                            {selectedTerm.buyerCost > 5 ? <><IconMan className="inline w-3 h-3 mr-1"/> Comprador</> : ''}
                                                         </div>
                                                     </div>
+                                                    <p className="text-xs text-gray-400 mt-2 text-right">El icono marca el punto exacto donde la obligación de pago se transfiere.</p>
+
+                                                    {/* Bloque de Seguro para CIF/CIP */}
+                                                    {(selectedTerm.id === 'CIF' || selectedTerm.id === 'CIP') && (
+                                                        <div className="flex items-center justify-center p-2 mt-4 bg-teal-50 border-t border-teal-200 rounded-b-lg">
+                                                            <span className="text-sm font-semibold text-teal-700 flex items-center gap-1">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 22V10L8 5L2 10V22M2 10L12 3L22 10M12 22V15"/></svg>
+                                                                SEGURO INCLUIDO ({selectedTerm.id === 'CIP' ? 'COBERTURA AMPLIA CLÁUSULA A' : 'COBERTURA MÍNIMA CLÁUSULA C'})
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             {/* Advertencias */}
-                                            {(selectedTerm.id === 'FOB' || selectedTerm.id === 'CIF' || selectedTerm.id === 'CFR') && (
+                                            {(selectedTerm.id === 'FOB' || selectedTerm.id === 'CIF' || selectedTerm.id === 'CFR' || selectedTerm.id === 'FAS' || selectedTerm.id === 'EXW') && (
                                                 <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex gap-3">
                                                     <IconAlert className="text-amber-600 flex-shrink-0" />
                                                     <div>
                                                         <h4 className="font-bold text-amber-800 text-sm">¡Advertencia!</h4>
-                                                        <p className="text-sm text-amber-700 mt-1">
-                                                            Esta regla es exclusiva para transporte marítimo. Si la mercancía viaja en <strong>contenedor</strong>, se recomienda usar <strong>{selectedTerm.id === 'FOB' ? 'FCA' : 'CIP/CPT'}</strong>, ya que el riesgo en contenedores suele transferirse antes de cargar el buque.
-                                                        </p>
+                                                        {selectedTerm.id === 'EXW' ? (
+                                                            <p className="text-sm text-amber-700 mt-1">
+                                                                EXW se recomienda **principalmente para comercio doméstico**. Su uso en transacciones internacionales puede generar dificultades para el vendedor con la prueba de exportación. Considere FCA.
+                                                            </p>
+                                                        ) : (
+                                                            <p className="text-sm text-amber-700 mt-1">
+                                                                Esta regla es exclusiva para transporte marítimo. Si la mercancía viaja en <strong>contenedor</strong>, se recomienda usar <strong>{selectedTerm.id === 'FOB' || selectedTerm.id === 'FAS' ? 'FCA' : 'CIP/CPT'}</strong>, ya que el riesgo en contenedores suele transferirse antes de cargar el buque.
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )}
