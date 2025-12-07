@@ -68,6 +68,9 @@
         const IconCheck = ({ className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>
         );
+        const IconX = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18M6 6l12 12"/></svg>
+        );
         
         // Iconos de Rol
         const IconWoman = ({ className }) => (
@@ -159,7 +162,7 @@
               type: 'sea', details: 'Similar a CFR, pero el vendedor debe contratar un seguro de cobertura **mínima (Cláusula C)** a favor del comprador.' },
         ];
 
-        // --- NUEVA DATA DE DETALLES DE RIESGOS Y COSTOS PARA EL ASISTENTE (ICC Checklist) ---
+        // --- DATA DE DETALLES DE RIESGOS Y COSTOS PARA EL ASISTENTE (ICC Checklist) ---
         const incotermsDetails = {
             'EXW': {
                 sellerRisks: ['Riesgo mínimo (solo en el almacén).'],
@@ -240,6 +243,26 @@
             }
         };
 
+        // --- NUEVA DATA DEL REPORTE IBEROAMERICANO (Observancia de la ICC) ---
+        const observanceData = {
+            generalUse: {
+                totalObservance: 81, // % que usa Incoterms 2020 según reglamento
+                totalNonObservance: 19, // % que usa términos distintos
+            },
+            containerNonObservance: {
+                totalNonObservance: 85, // % que no aplica la recomendación de la ICC para contenedores (Gráfico 9)
+                nonObservanceByCountry: [
+                    { country: 'Argentina', value: 87, label: 'No aplica (FOB/CFR/CIF)' }, // Estimado del gráfico 9
+                    { country: 'Colombia', value: 80, label: 'No aplica (FOB/CFR/CIF)' },
+                    { country: 'Costa Rica', value: 100, label: 'No aplica (FOB/CFR/CIF)' }, // 100% en el gráfico 9
+                    { country: 'Ecuador', value: 77, label: 'No aplica (FOB/CFR/CIF)' },
+                    { country: 'España', value: 80, label: 'No aplica (FOB/CFR/CIF)' },
+                    { country: 'México', value: 95, label: 'No aplica (FOB/CFR/CIF)' }, // 95% en el gráfico 9
+                    { country: 'Panamá', value: 80, label: 'No aplica (FOB/CFR/CIF)' }, // 80% en el gráfico 9
+                ],
+            }
+        };
+
         // Componente que decide qué icono mostrar en la barra de riesgo y dónde posicionarlo
         const RiskMarker = ({ term }) => {
             // Se utiliza IconBox universal para todos los términos
@@ -288,10 +311,82 @@
             </button>
         );
 
+        // Componente para mostrar la No Observancia ICC (Paso 5 del Asistente)
+        const ObservanceAnalysis = ({ onReturn }) => {
+            const data = observanceData.containerNonObservance;
+
+            return (
+                <div className="space-y-6">
+                    <h3 className="text-2xl font-extrabold text-red-700 flex items-center gap-2">
+                        <IconAlert className="w-8 h-8"/> Uso vs. Recomendación ICC
+                    </h3>
+                    <p className="text-sm text-gray-600 border-l-4 border-red-400 pl-3 italic">
+                        La recomendación oficial de la ICC es usar **FCA** (o CPT/CIP) cuando la mercancía viaja en contenedor. El reporte Iberoamericano muestra que esta es una práctica con baja observancia.
+                    </p>
+
+                    {/* Gráfico de Barra General */}
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h4 className="font-semibold text-lg mb-3">Promedio Iberoamericano (Contenedores)</h4>
+                        <div className="flex items-center space-x-4">
+                            {/* Porcentaje de No Observancia */}
+                            <div className="text-4xl font-extrabold text-red-600 w-24 text-center">
+                                {data.totalNonObservance}%
+                            </div>
+                            {/* Barra de Progreso */}
+                            <div className="flex-grow bg-gray-200 rounded-full h-8 flex overflow-hidden">
+                                <div 
+                                    className="bg-red-500 h-full flex items-center justify-center text-white text-xs font-bold" 
+                                    style={{width: `${data.totalNonObservance}%`}}
+                                >
+                                    No Aplica Recomendación
+                                </div>
+                                <div 
+                                    className="bg-green-500 h-full flex items-center justify-center text-white text-xs font-bold" 
+                                    style={{width: `${100 - data.totalNonObservance}%`}}
+                                >
+                                    Aplica Recomendación
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Porcentaje de transacciones contenedorizadas que **NO** usan FCA/CPT/CIP (usan FOB/CFR/CIF), según el reporte ICC 2023.</p>
+                    </div>
+
+                    {/* Distribución por País (Mini Gráfico) */}
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h4 className="font-semibold text-lg mb-4">No Observancia por País (Ejemplos)</h4>
+                        <div className="space-y-3">
+                            {data.nonObservanceByCountry.map((item) => (
+                                <div key={item.country}>
+                                    <div className="flex justify-between text-sm font-medium">
+                                        <span>{item.country}</span>
+                                        <span className="text-red-600">{item.value}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-3">
+                                        <div 
+                                            className="bg-red-400 h-3 rounded-full" 
+                                            style={{width: `${item.value}%`}}
+                                            title={`${item.country}: ${item.value}%`}
+                                        ></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-3">Fuente: Reporte Iberoamericano sobre el uso de las Reglas Incoterms 2020 (ICC 2023).</p>
+                    </div>
+
+                    <button onClick={onReturn} className="mt-6 bg-gray-200 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-300">
+                        Volver al Asistente Principal
+                    </button>
+                </div>
+            );
+        };
+
         // Nuevo componente para mostrar el Análisis Detallado (Paso 4 del Asistente)
-        const DetailAnalysis = ({ termId, onReturn }) => {
+        const DetailAnalysis = ({ termId, onReturn, onShowObservance }) => {
             const termData = incotermsData.find(t => t.id === termId);
             const details = incotermsDetails[termId];
+
+            const isSeaTerm = ['FAS', 'FOB', 'CFR', 'CIF'].includes(termId);
 
             return (
                 <div className="space-y-6">
@@ -352,9 +447,20 @@
                         <p className="text-sm text-yellow-700">{details.warning}</p>
                     </div>
 
-                    <button onClick={onReturn} className="mt-6 bg-gray-200 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-300">
-                        Volver al Asistente
-                    </button>
+                    <div className="flex justify-between pt-4 border-t border-gray-200">
+                         {isSeaTerm && (
+                            <button 
+                                onClick={onShowObservance} 
+                                className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 flex items-center gap-2 text-sm"
+                                title="Ver cómo se usa realmente este término para contenedores"
+                            >
+                                <IconX className="w-4 h-4"/> Ver No Observancia ICC
+                            </button>
+                        )}
+                        <button onClick={onReturn} className={`bg-gray-200 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-300 ${!isSeaTerm ? 'w-full' : ''}`}>
+                            Volver al Asistente
+                        </button>
+                    </div>
                 </div>
             );
         }
@@ -389,6 +495,10 @@
                 setStep(4); // Mostrar análisis detallado
             };
 
+            const handleShowObservance = () => {
+                setStep(5); // Mostrar análisis de observancia
+            };
+
             const handleReturnToWizard = () => {
                 setStep(1);
                 setTransport(null);
@@ -398,7 +508,21 @@
             if (step === 4) {
                 return (
                     <div className="w-full max-w-4xl mx-auto">
-                        <DetailAnalysis termId={finalRecommendation} onReturn={handleReturnToWizard} />
+                        <DetailAnalysis 
+                            termId={finalRecommendation} 
+                            onReturn={() => setStep(3)} // Regresar a la recomendación inicial o el paso anterior.
+                            onShowObservance={handleShowObservance}
+                        />
+                    </div>
+                );
+            }
+
+            if (step === 5) {
+                 return (
+                    <div className="w-full max-w-4xl mx-auto">
+                        <ObservanceAnalysis 
+                            onReturn={() => setStep(4)} // Regresar al análisis detallado
+                        />
                     </div>
                 );
             }
@@ -437,7 +561,7 @@
                     {step === 3 && (
                         <div className="text-center">
                             <p className="font-semibold mb-2">Paso 3: Recomendación Inicial</p>
-                            {transport === 'poly' ? (
+                            {transport === 'poly' || finalRecommendation === 'FCA' ? (
                                 <>
                                     <p className="text-green-600 font-bold mb-4 text-xl">Recomendación: FCA</p>
                                     <p className="text-sm text-gray-600 mb-4">Para transporte multimodal (aéreo, terrestre o contenedor), **FCA** es el término F más seguro y versátil.</p>
