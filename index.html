@@ -65,6 +65,9 @@
         const IconPresentation = ({ className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
         );
+        const IconCheck = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>
+        );
         
         // Iconos de Rol
         const IconWoman = ({ className }) => (
@@ -156,6 +159,87 @@
               type: 'sea', details: 'Similar a CFR, pero el vendedor debe contratar un seguro de cobertura **mínima (Cláusula C)** a favor del comprador.' },
         ];
 
+        // --- NUEVA DATA DE DETALLES DE RIESGOS Y COSTOS PARA EL ASISTENTE (ICC Checklist) ---
+        const incotermsDetails = {
+            'EXW': {
+                sellerRisks: ['Riesgo mínimo (solo en el almacén).'],
+                buyerRisks: ['Todos los riesgos desde la recogida.', 'Riesgo de daño durante la carga (si la hace el comprador).', 'Riesgos totales en transporte principal.'],
+                sellerCosts: ['Costo de embalaje y etiquetado.'],
+                buyerCosts: ['Carga en origen.', 'Transporte principal.', 'Seguro.', 'Aduanas y tasas de exportación e importación.'],
+                warning: 'No recomendado para transacciones internacionales debido a problemas de prueba de exportación.'
+            },
+            'FCA': {
+                sellerRisks: ['Riesgo hasta la entrega al primer transportista.'],
+                buyerRisks: ['Todos los riesgos desde la entrega al primer transportista.', 'Riesgo de daño en el transporte principal.'],
+                sellerCosts: ['Embalaje.', 'Carga en origen.', 'Formalidades de exportación y tasas.'],
+                buyerCosts: ['Transporte principal (flete).', 'Seguro (Opcional, pero recomendado).', 'Descarga en destino.', 'Formalidades de importación y tasas.'],
+                warning: 'Regla F ideal para carga en contenedor (FCL/LCL) en cualquier modo de transporte.'
+            },
+            'CPT': {
+                sellerRisks: ['Riesgo hasta la entrega al primer transportista (Riesgo en Origen).'],
+                buyerRisks: ['Todos los riesgos desde la entrega al primer transportista (Riesgo en Origen).'],
+                sellerCosts: ['Embalaje.', 'Formalidades de exportación.', 'Flete principal hasta el destino convenido (Costo en Destino).'],
+                buyerCosts: ['Seguro (Opcional, pero recomendado).', 'Descarga en destino.', 'Formalidades de importación y tasas.', 'Costos adicionales por demora en puerto (Demurrage) en destino.'],
+                warning: 'Separación de Riesgo (Origen) y Costo (Destino). Ideal para transporte multimodal.'
+            },
+            'CIP': {
+                sellerRisks: ['Riesgo hasta la entrega al primer transportista (Riesgo en Origen).'],
+                buyerRisks: ['Todos los riesgos desde la entrega al primer transportista (Riesgo en Origen).'],
+                sellerCosts: ['Embalaje.', 'Formalidades de exportación.', 'Flete principal hasta el destino convenido.', 'Seguro (OBLIGATORIO: Cobertura amplia Cláusula A).'],
+                buyerCosts: ['Descarga en destino.', 'Formalidades de importación y tasas.', 'Costos adicionales por demora en puerto (Demurrage) en destino.'],
+                warning: 'Similar a CPT, pero requiere seguro de **máxima cobertura (Cláusula A)**, que cubre los riesgos del comprador.'
+            },
+            'DAP': {
+                sellerRisks: ['Máximo riesgo: Hasta que la mercancía está lista para la descarga en el lugar de destino.'],
+                buyerRisks: ['Riesgo de descarga en destino.', 'Riesgo durante la aduana de importación.'],
+                sellerCosts: ['Transporte principal, seguro y todos los costos hasta el destino (sin incluir la descarga).'],
+                buyerCosts: ['Descarga en destino.', 'Formalidades de importación, impuestos y tasas.'],
+                warning: 'El vendedor NO es responsable de la descarga ni de las formalidades de importación.'
+            },
+            'DPU': {
+                sellerRisks: ['Máximo riesgo: Hasta que la mercancía está **descargada** en el lugar de destino.'],
+                buyerRisks: ['Riesgo durante la aduana de importación.'],
+                sellerCosts: ['Transporte principal, seguro, todos los costos y la **DESCARGA** en el lugar de destino.'],
+                buyerCosts: ['Formalidades de importación, impuestos y tasas.'],
+                warning: 'Única regla que hace al vendedor responsable de la DESCARGA en el lugar de destino.'
+            },
+            'DDP': {
+                sellerRisks: ['Riesgo total: Hasta que la mercancía está lista para la descarga en el destino final.'],
+                buyerRisks: ['Riesgo mínimo (solo la descarga).'],
+                sellerCosts: ['Máximo costo: Transporte, seguro, exportación, importación y aranceles (Delivered Duty Paid).'],
+                buyerCosts: ['Descarga en destino.'],
+                warning: 'Máxima obligación para el vendedor. Asumir la aduana de importación puede ser complejo para el vendedor.'
+            },
+            'FAS': {
+                sellerRisks: ['Riesgo hasta que la mercancía está **al costado del buque** en el puerto de embarque.'],
+                buyerRisks: ['Riesgo desde que la mercancía está al costado del buque.', 'Riesgo de carga a bordo.', 'Riesgos totales en transporte principal.'],
+                sellerCosts: ['Embalaje.', 'Formalidades de exportación.', 'Entrega al muelle (al costado del buque).'],
+                buyerCosts: ['Carga a bordo.', 'Flete principal y seguro.', 'Formalidades de importación.'],
+                warning: 'Exclusivo marítimo (carga general). **Usar FCA si es contenedor**.'
+            },
+            'FOB': {
+                sellerRisks: ['Riesgo hasta que la mercancía está **a bordo del buque** en el puerto de embarque.'],
+                buyerRisks: ['Riesgo desde que la mercancía está a bordo del buque.', 'Riesgos totales en transporte principal.'],
+                sellerCosts: ['Embalaje.', 'Formalidades de exportación.', 'Entrega y carga a bordo.'],
+                buyerCosts: ['Flete principal y seguro.', 'Formalidades de importación.'],
+                warning: 'Exclusivo marítimo (carga general). **Usar FCA si es contenedor**.'
+            },
+            'CFR': {
+                sellerRisks: ['Riesgo hasta que la mercancía está **a bordo del buque** (Riesgo en Origen).'],
+                buyerRisks: ['Riesgo desde que la mercancía está a bordo del buque (Riesgo en Origen).'],
+                sellerCosts: ['Embalaje.', 'Formalidades de exportación.', 'Flete principal hasta el puerto de destino (Costo en Destino).'],
+                buyerCosts: ['Descarga en destino.', 'Seguro (Opcional, pero recomendado).', 'Formalidades de importación y tasas.'],
+                warning: 'Separación de Riesgo (Origen) y Costo (Destino). Exclusivo marítimo.'
+            },
+            'CIF': {
+                sellerRisks: ['Riesgo hasta que la mercancía está **a bordo del buque** (Riesgo en Origen).'],
+                buyerRisks: ['Riesgo desde que la mercancía está a bordo del buque (Riesgo en Origen).'],
+                sellerCosts: ['Embalaje.', 'Formalidades de exportación.', 'Flete principal hasta el puerto de destino.', 'Seguro (OBLIGATORIO: Cobertura mínima Cláusula C).'],
+                buyerCosts: ['Descarga en destino.', 'Formalidades de importación y tasas.'],
+                warning: 'Similar a CFR, pero incluye seguro de **cobertura mínima (Cláusula C)** a cargo del vendedor.'
+            }
+        };
+
         // Componente que decide qué icono mostrar en la barra de riesgo y dónde posicionarlo
         const RiskMarker = ({ term }) => {
             // Se utiliza IconBox universal para todos los términos
@@ -204,9 +288,81 @@
             </button>
         );
 
+        // Nuevo componente para mostrar el Análisis Detallado (Paso 4 del Asistente)
+        const DetailAnalysis = ({ termId, onReturn }) => {
+            const termData = incotermsData.find(t => t.id === termId);
+            const details = incotermsDetails[termId];
+
+            return (
+                <div className="space-y-6">
+                    <h3 className="text-2xl font-extrabold text-indigo-700">{termData.id} - Análisis Detallado</h3>
+                    <p className="text-sm text-gray-600 border-l-4 border-indigo-400 pl-3 italic">
+                        {termData.details.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
+                    </p>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        
+                        {/* Riesgos Clave */}
+                        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                            <h4 className="font-bold text-lg text-red-700 flex items-center gap-2 mb-3">
+                                <IconWoman className="w-5 h-5 text-blue-600"/> <IconMan className="w-5 h-5 text-orange-600"/>
+                                Puntos Clave de RIESGO
+                            </h4>
+                            <ul className="space-y-2 text-sm text-gray-700">
+                                {details.sellerRisks.map((risk, index) => (
+                                    <li key={`sr-${index}`} className="flex items-start gap-2">
+                                        <IconCheck className="w-4 h-4 text-blue-500 mt-1 flex-shrink-0" />
+                                        <span className='font-medium text-blue-600'>Vendedor:</span> {risk}
+                                    </li>
+                                ))}
+                                {details.buyerRisks.map((risk, index) => (
+                                    <li key={`br-${index}`} className="flex items-start gap-2">
+                                        <IconCheck className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
+                                        <span className='font-medium text-orange-600'>Comprador:</span> {risk}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Costos Críticos */}
+                        <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                            <h4 className="font-bold text-lg text-green-700 flex items-center gap-2 mb-3">
+                                <IconDollar className="w-5 h-5 text-green-600"/>
+                                Costos Críticos y Disputas
+                            </h4>
+                            <ul className="space-y-2 text-sm text-gray-700">
+                                {details.sellerCosts.map((cost, index) => (
+                                    <li key={`sc-${index}`} className="flex items-start gap-2">
+                                        <IconCheck className="w-4 h-4 text-blue-500 mt-1 flex-shrink-0" />
+                                        <span className='font-medium text-blue-600'>Vendedor Paga:</span> {cost}
+                                    </li>
+                                ))}
+                                {details.buyerCosts.map((cost, index) => (
+                                    <li key={`bc-${index}`} className="flex items-start gap-2">
+                                        <IconCheck className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
+                                        <span className='font-medium text-orange-600'>Comprador Paga:</span> {cost}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <h5 className="font-bold text-yellow-800">Nota Especial:</h5>
+                        <p className="text-sm text-yellow-700">{details.warning}</p>
+                    </div>
+
+                    <button onClick={onReturn} className="mt-6 bg-gray-200 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-300">
+                        Volver al Asistente
+                    </button>
+                </div>
+            );
+        }
+
         const Wizard = ({ onRecommend }) => {
             const [step, setStep] = useState(1);
             const [transport, setTransport] = useState(null);
+            const [finalRecommendation, setFinalRecommendation] = useState(null);
             
             const handleTransport = (type) => {
                 setTransport(type);
@@ -218,12 +374,34 @@
             };
 
             const handleContainer = (isContainer) => {
+                let recId;
                 if (isContainer) {
-                    onRecommend('FCA'); 
+                    recId = 'FCA'; 
                 } else {
-                    onRecommend('FOB'); 
+                    recId = 'FOB'; 
                 }
+                setFinalRecommendation(recId);
+                setStep(3); // Saltar a la recomendación final
             };
+
+            const handleRecommendationAccept = (termId) => {
+                setFinalRecommendation(termId);
+                setStep(4); // Mostrar análisis detallado
+            };
+
+            const handleReturnToWizard = () => {
+                setStep(1);
+                setTransport(null);
+                setFinalRecommendation(null);
+            };
+
+            if (step === 4) {
+                return (
+                    <div className="w-full max-w-4xl mx-auto">
+                        <DetailAnalysis termId={finalRecommendation} onReturn={handleReturnToWizard} />
+                    </div>
+                );
+            }
 
             return (
                 <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
@@ -233,37 +411,50 @@
                     
                     {step === 1 && (
                         <div className="space-y-3">
-                            <p className="mb-4">¿Qué tipo de transporte utilizarás?</p>
+                            <p className="mb-4 font-semibold">Paso 1: ¿Qué tipo de transporte utilizarás?</p>
                             <button onClick={() => handleTransport('sea')} className="w-full p-3 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 font-medium border border-blue-200 flex items-center gap-2 justify-center">
-                                <IconShip className="w-5 h-5"/> Marítimo / Vías Navegables
+                                <IconShip className="w-5 h-5"/> Marítimo / Vías Navegables (Reglas FAS, FOB, CFR, CIF)
                             </button>
                             <button onClick={() => handleTransport('poly')} className="w-full p-3 bg-green-50 text-green-700 rounded hover:bg-green-100 font-medium border border-green-200 flex items-center gap-2 justify-center">
-                                <IconTruck className="w-5 h-5"/> Polivalente / Aéreo / Terrestre
+                                <IconTruck className="w-5 h-5"/> Polivalente / Multimodal (Reglas E, F, C, D)
                             </button>
                         </div>
                     )}
 
                     {step === 2 && transport === 'sea' && (
                         <div className="space-y-3">
-                            <p className="mb-4">¿La mercancía viaja en contenedor?</p>
+                            <p className="mb-4 font-semibold">Paso 2: Si es Marítimo, ¿la mercancía viaja en contenedor?</p>
                             <button onClick={() => handleContainer(true)} className="w-full p-3 bg-purple-50 text-purple-700 rounded hover:bg-purple-100 font-medium border border-purple-200">
                                 ✅ Sí, en contenedor
                             </button>
                             <button onClick={() => handleContainer(false)} className="w-full p-3 bg-gray-50 text-gray-700 rounded hover:bg-gray-100 font-medium border border-gray-200">
-                                ❌ No, a granel / carga general
+                                ❌ No, a granel / carga general (Recomendado FOB/FAS)
                             </button>
-                            <button onClick={() => setStep(1)} className="text-sm text-gray-400 mt-2 underline">Volver</button>
+                            <button onClick={() => setStep(1)} className="text-sm text-gray-400 mt-2 underline">Volver al Paso 1</button>
                         </div>
                     )}
 
                     {step === 3 && (
                         <div className="text-center">
-                            <p className="text-green-600 font-bold mb-2">Recomendación:</p>
-                            <p className="text-sm text-gray-600 mb-4">Para transporte polivalente, usa reglas "Cualquier Modo".</p>
-                            <button onClick={() => onRecommend('FCA')} className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700">
-                                Ver Reglas Multimodales (FCA, CPT...)
-                            </button>
-                            <button onClick={() => setStep(1)} className="block w-full text-sm text-gray-400 mt-4 underline">Reiniciar</button>
+                            <p className="font-semibold mb-2">Paso 3: Recomendación Inicial</p>
+                            {transport === 'poly' ? (
+                                <>
+                                    <p className="text-green-600 font-bold mb-4 text-xl">Recomendación: FCA</p>
+                                    <p className="text-sm text-gray-600 mb-4">Para transporte multimodal (aéreo, terrestre o contenedor), **FCA** es el término F más seguro y versátil.</p>
+                                    <button onClick={() => handleRecommendationAccept('FCA')} className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700">
+                                        Ver Análisis FCA
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-blue-600 font-bold mb-4 text-xl">Recomendación: {finalRecommendation}</p>
+                                    <p className="text-sm text-gray-600 mb-4">El término **{finalRecommendation}** es el adecuado para tu tipo de carga y transporte marítimo.</p>
+                                    <button onClick={() => handleRecommendationAccept(finalRecommendation)} className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700">
+                                        Ver Análisis Detallado
+                                    </button>
+                                </>
+                            )}
+                            <button onClick={handleReturnToWizard} className="block w-full text-sm text-gray-400 mt-4 underline">Reiniciar Asistente</button>
                         </div>
                     )}
                 </div>
