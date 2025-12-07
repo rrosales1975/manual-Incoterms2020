@@ -306,9 +306,9 @@
                                                         {selectedTerm.name}
                                                     </p>
                                                 </div>
-                                                {/* Icono Principal: USA solo Buque o Camión como representacion genérica del grupo */}
+                                                {/* CAMBIO: Usar el icono específico determinado por la función getTermIcon */}
                                                 <div className={`p-3 rounded-full ${selectedTerm.type === 'sea' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
-                                                    {selectedTerm.type === 'sea' ? <IconShip className="w-8 h-8"/> : <IconTruck className="w-8 h-8"/>}
+                                                    {getTermIcon(selectedTerm.id, selectedTerm.type, 'w-8 h-8')}
                                                 </div>
                                             </div>
                                             <p className={`mt-4 text-lg leading-relaxed ${presentationMode ? 'text-gray-400' : 'text-gray-600'}`}>
